@@ -93,9 +93,11 @@ for rat = 1:4
         
         % consensus clustering
         ciconsensus = fcn_consensus_communities(ci,10);
+        [gx,gy,idx] = fcn_plot_blocks(ciconsensus);
+        CIJ_comm = ag(idx,idx); 
         
         if plt % run plot blocks again
-            [gx,gy,idx] = fcn_plot_blocks(ciconsensus);
+            
             
             % visualize matrix
             h = figure; imagesc(ag(idx,idx)); hold on;
@@ -113,6 +115,7 @@ for rat = 1:4
         disp(strjoin(["Number of Nodes:                ", num2str(numNodes)]));
         disp(strjoin(["Number of Edges:                ", num2str(numEdges)]));
         disp(strjoin(["Density:                        ", num2str(density)]));
+        disp(strjoin(["Avg Mat Sim:                    ", num2str(mean2(CIJ))]));
         disp(strjoin(["Average Path Length (weighted): ", num2str(pth)]));
         disp(strjoin(["Efficiency:                     ", num2str(eff)]));
         disp(strjoin(["Average Degree:                 ", num2str(mean(deg))]));
@@ -137,12 +140,15 @@ for rat = 1:4
         %netStats.(fields{i}).          =    ;
         
         % Between rat
-        btRats.degs(rat,i)       = mean(deg);
-        btRats.meanq(rat,i)      = mean(q);
-        btRats.phase(i).deg{rat} = sort(deg, 'descend');
-        btRats.phase(i).CIJ{rat} = CIJ;
-        btRats.phase(i).ci{rat}  = mean(max(ci));
-        btRats.phase(i).q{rat}   = mean(q);
+        btRats.degs(rat,i)             = mean(deg);
+        btRats.mSim(rat,i)             = mean2(CIJ);
+        btRats.meanq(rat,i)            = mean(q);
+        btRats.meanci(rat,i)           = mean(max(ci));
+        btRats.phase(i).deg{rat}       = sort(deg, 'descend');
+        btRats.phase(i).CIJ{rat}       = CIJ;
+        btRats.phase(i).CIJCM{rat}     = CIJ_comm;
+        btRats.phase(i).ci{rat}        = mean(max(ci));
+        btRats.phase(i).q{rat}         = mean(q);
         disp(' ')
     end
     
@@ -152,10 +158,12 @@ for rat = 1:4
 end
 t=toc; % Takes around 44s
 disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
+    
+% save it for later
+save("Mats/btRats.mat","btRats");
 
 
-
-%% Between rats...
+%% Analyze between rats...
 
 if 0 % plot connectivity matricies for one rat
     h = figure('Position', [700, 100, 700, 225]); hold on;
@@ -186,6 +194,27 @@ if 0 % plot connectivity matricies for one rat
     saveas(h,  char(figName+".png"));
 end
 
+if 0 % Average similarity increases?
+    h = figure; hold on;
+    cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
+    for zz = 1:size(btRats.mSim,1)
+        hold on;
+        scatter(1:3,btRats.mSim(zz,:),70,cVec(zz,:),'filled');
+        line(1:3,btRats.mSim(zz,:),'Color',cVec(zz,:))
+        %plot(btRats.degs(zz,:)', 'LineWidth',3);
+        
+        ylabel('Average Similarity Matrix Values');
+        set(gca,'XTick',[0 1 2 3 4])
+        names = {'PRE';'MAZE';'POST'};
+        set(gca,'xtick',[1:3],'xticklabel',names)
+        xlim([.5 3.5]);
+        ax = gca; ax.FontSize = 14; 
+    end
+    
+    figName = "Figs/avgSim";
+    savefig(h, char(figName+".fig"));
+    saveas(h,  char(figName+".png"));
+end
 
 if 0 % Average degree increases?
     h = figure; hold on;
@@ -209,6 +238,27 @@ if 0 % Average degree increases?
     saveas(h,  char(figName+".png"));
 end
 
+if 0 % Average number of communities?
+    h = figure; hold on;
+    cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
+    for zz = 1:size(btRats.meanci,1)
+        hold on;
+        scatter(1:3,btRats.meanci(zz,:),70,cVec(zz,:),'filled');
+        line(1:3,btRats.meanci(zz,:),'Color',cVec(zz,:))
+        %plot(btRats.degs(zz,:)', 'LineWidth',3);
+        
+        ylabel('Average Number of Communities');
+        set(gca,'XTick',[0 1 2 3 4])
+        names = {'PRE';'MAZE';'POST'};
+        set(gca,'xtick',[1:3],'xticklabel',names)
+        xlim([.5 3.5]);
+        ax = gca; ax.FontSize = 14; 
+    end
+    
+    figName = "Figs/avgCi";
+    savefig(h, char(figName+".fig"));
+    saveas(h,  char(figName+".png"));
+end
 
 if 0 % Average q?
     h = figure; hold on;
