@@ -2,7 +2,6 @@
 
 % Define inter-rat struct
 btRats.degs = zeros(4,3);
-btRats.deg = {};
 btRats.meanq = zeros(4,3);
 plt = 0;
 
@@ -141,9 +140,13 @@ for rat = 1:4
         
         % Between rat
         btRats.degs(rat,i)             = mean(deg);
+        btRats.degsSEM(rat,i)          = std(deg)/sqrt(length(deg));
         btRats.mSim(rat,i)             = mean2(CIJ);
+        btRats.q(rat,i,:)              = q;
         btRats.meanq(rat,i)            = mean(q);
+        btRats.meanqSEM(rat,i)         = std(q)/sqrt(length(q));
         btRats.meanci(rat,i)           = mean(max(ci));
+        btRats.meanciSEM(rat,i)        = std(max(ci))/sqrt(length(max(ci)));
         btRats.phase(i).deg{rat}       = sort(deg, 'descend');
         btRats.phase(i).CIJ{rat}       = CIJ;
         btRats.phase(i).CIJCM{rat}     = CIJ_comm;
@@ -156,6 +159,7 @@ for rat = 1:4
     saveName = "Mats/netStats_" + ratName + ".mat";
     save(saveName,"netStats");
 end
+disp('fin')
 t=toc; % Takes around 44s
 disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
     
@@ -221,15 +225,18 @@ if 0 % Average degree increases?
     cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
     for zz = 1:size(btRats.degs,1)
         hold on;
+        err = btRats.degsSEM(zz,:);
+        errorbar(1:3, btRats.degs(zz,:), err,'k');
         scatter(1:3,btRats.degs(zz,:),70,cVec(zz,:),'filled');
-        line(1:3,btRats.degs(zz,:),'Color',cVec(zz,:))
+        line(1:3,btRats.degs(zz,:),'Color',cVec(zz,:));
+        
         %plot(btRats.degs(zz,:)', 'LineWidth',3);
         
         ylabel('Average Degree');
         set(gca,'XTick',[0 1 2 3 4])
         names = {'PRE';'MAZE';'POST'};
         set(gca,'xtick',[1:3],'xticklabel',names)
-        xlim([.5 3.5]);
+        xlim([.5 3.5]); ylim([0 210]);
         ax = gca; ax.FontSize = 14; 
     end
     
@@ -238,20 +245,51 @@ if 0 % Average degree increases?
     saveas(h,  char(figName+".png"));
 end
 
+if 0 % plot community matricies for one rat
+    h = figure('Position', [700, 700, 225, 700]); hold on;
+    subplot(3,1,1); 
+    imagesc(btRats.phase(1).CIJCM{1})
+    title({'Communities'; 'PRE'}); 
+    ax = gca; 
+    set(gca,'YTickLabel',[]); set(gca,'XTickLabel',[]); 
+    ax.FontSize = 14;
+
+    subplot(3,1,2); 
+    imagesc(btRats.phase(2).CIJCM{1})
+    title({'Maze'})
+    ax = gca; 
+    set(gca,'YTickLabel',[]); set(gca,'XTickLabel',[]); 
+    ax.FontSize = 14;
+
+    subplot(3,1,3); 
+    imagesc(btRats.phase(3).CIJCM{1})
+    title('POST');
+    ax = gca;
+    set(gca,'YTickLabel',[]); set(gca,'XTickLabel',[]); 
+    ax.FontSize = 14;
+
+    
+    figName = "Figs/CIJ/achCIJ_commV";
+    savefig(h, char(figName+".fig"));
+    saveas(h,  char(figName+".png"));
+end
+
+
 if 0 % Average number of communities?
     h = figure; hold on;
     cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
     for zz = 1:size(btRats.meanci,1)
-        hold on;
+        hold on; % Really low error
+        err = btRats.meanciSEM(zz,:);
+        errorbar(1:3, btRats.meanci(zz,:), err,'k');
         scatter(1:3,btRats.meanci(zz,:),70,cVec(zz,:),'filled');
         line(1:3,btRats.meanci(zz,:),'Color',cVec(zz,:))
-        %plot(btRats.degs(zz,:)', 'LineWidth',3);
         
         ylabel('Average Number of Communities');
         set(gca,'XTick',[0 1 2 3 4])
         names = {'PRE';'MAZE';'POST'};
         set(gca,'xtick',[1:3],'xticklabel',names)
-        xlim([.5 3.5]);
+        xlim([.5 3.5]); ylim([1 37])
         ax = gca; ax.FontSize = 14; 
     end
     
@@ -264,10 +302,11 @@ if 0 % Average q?
     h = figure; hold on;
     cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
     for zz = 1:size(btRats.meanq,1)
-        hold on;
+        hold on; % Really low error
+        err = btRats.meanqSEM(zz,:);
+        errorbar(1:3, btRats.meanq(zz,:), err,'k');
         scatter(1:3,btRats.meanq(zz,:),70,cVec(zz,:),'filled');
         line(1:3,btRats.meanq(zz,:),'Color',cVec(zz,:))
-        %plot(btRats.degs(zz,:)', 'LineWidth',3);
         
         ylabel('Average Q Value');
         set(gca,'XTick',[0 1 2 3 4])
@@ -286,8 +325,7 @@ end
 
 
 if 0 % plot degree distribution
-        cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
-
+cVec = [[0 1 0]; [1 0 1]; [0 1 1]; [1 0 0]];
 h = figure; 
 subplot(3,1,1); hold on; 
 cellfun(@plot, btRats.phase(1).deg); title({' Degree Distribution'; 'PRE'})
@@ -350,6 +388,25 @@ if 0
     hold off; axis image; view([0,90]);
 end
 
+
+%%
+
+if 0
+% Grab null model
+np = ratMats.null.pre;
+np(np<0) = 0;
+np(isnan(np)) = 0;
+mean2(np)
+[density,numNodes,numEdges] = density_dir(np);
+[id,od,deg] = degrees_dir(np);
+
+% To remove diag:
+%JIC(find(eye(size(JIC)))) = 0;
+
+% subtract null
+%figure; imagesc(CIJ - JIC)
+
+end
 
 
 
