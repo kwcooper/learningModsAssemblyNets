@@ -1,7 +1,7 @@
 
 % Flags for plotting
 viewCorr = 1;
-viewNull = 1;
+viewNull = 0;
 runNull  = 1;
 viewRast = 0;
 
