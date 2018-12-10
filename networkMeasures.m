@@ -96,8 +96,7 @@ for rat = 1:4
         CIJ_comm = ag(idx,idx); 
         
         if plt % run plot blocks again
-            
-            
+         
             % visualize matrix
             h = figure; imagesc(ag(idx,idx)); hold on;
             plot(gx,gy,'w'); hold off;
