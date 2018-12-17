@@ -129,7 +129,7 @@ for rati = 1:4
         spikesConv = zeros(size(spikesT,1),size(spikesT,2)+kSize-1);
         
         for convi = 1:size(spikesT,1)
-            spikesConv(convi,:) = conv(k,spikesT(convi,:));
+            spikesConv(i,:) = conv(k,spikesT(i,:));
         end
         if 0, figure; plot(spikesConv(1,:)), end
         
@@ -150,17 +150,17 @@ for rati = 1:4
             % Gaussian Kernel is necessary
             % Almost 0 correlation...
             spikesRand = zeros(size(spikesT));
-            for spki = 1:size(spikesRand,1)
-                idx = sum(spikesT(spki,:));
+            for i = 1:size(spikesRand,1)
+                idx = sum(spikesT(i,:));
                 r = randperm(size(spikesT,2),idx);
-                spikesRand(spki,r) = 1;
+                spikesRand(i,r) = 1;
             end
             
             kSize = 10000;
             k = gaussmf(linspace(0,100,kSize),[kSize/4 kSize/2]);
             spikesConv = zeros(size(spikesRand,1),size(spikesRand,2)+kSize-1);
-            for spksi = 1:size(spikesT,1)
-                spikesConv(spksi,:) = conv(k,spikesRand(spksi,:));
+            for i = 1:size(spikesT,1)
+                spikesConv(i,:) = conv(k,spikesRand(i,:));
             end
             
             cRand = corr(spikesRand');
