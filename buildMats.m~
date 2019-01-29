@@ -49,7 +49,6 @@ for rati = 1:4
     ratsNullBuffer = zeros(3, size(clust,2), size(clust,2));
     count = 1;
     for phsi = [1,3,5]
-        % Grab specific phase
         disp(strjoin([labels(count), "phase..."]));
         spikeTimesSeg = spikeTimes(floor((phases(phsi)))+1 : (floor(phases(phsi+1))));
         spikeIDsSeg = spikeIDs(floor((phases(phsi)))+1 : (floor(phases(phsi+1))));
