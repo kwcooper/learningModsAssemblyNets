@@ -8,8 +8,9 @@ viewRast = 0;
 pwd
 % Choose dataset
 tic
-for rati = 1:4
+for rati = 1 %:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
+    tic
     disp('Loading Data...');
     if rati == 1
         load("NoveltySessInfoMatFiles/Achilles_11012013_sessInfo.mat")
@@ -31,6 +32,7 @@ for rati = 1:4
         ratName = "Gatsby_08022013";
     end
     
+    toc
     disp(strjoin(["running", ratName]))
     
     % unpack the data and split into phases
@@ -50,6 +52,7 @@ for rati = 1:4
     count = 1;
     for phsi = [1,3,5]
         % Grab specific phase
+        disp(" ")
         disp(strjoin([labels(count), "phase..."]));
         spikeTimesSeg = spikeTimes(floor((phases(phsi)))+1 : (floor(phases(phsi+1))));
         spikeIDsSeg = spikeIDs(floor((phases(phsi)))+1 : (floor(phases(phsi+1))));
@@ -174,6 +177,18 @@ for rati = 1:4
         
         ratsNullBuffer(count,:,:) = cRand;
         
+        %% Run conditional probability analysis
+        disp('Computing spike conditional probability...')
+        nrand = 100;
+        window = 20;
+        tic
+        [Names,~,NewID] = unique(spikeIDsSeg); % fix the naming
+        [spkeCount,probStats] = fcn_spikecondprob(NewID,spikeTimesSeg,window,nrand);
+        toc
+        figure; imagesc(probStats.pval(:,:,1))
+        
+        
+        
         count = count + 1;
         disp(' ')
     end
@@ -192,6 +207,8 @@ for rati = 1:4
     ratMats.spikeIDs   = spikeIDs;
     ratMats.phases     = phases;
     ratMats.name       = ratName;
+    ratMats.probStats  = probStats;
+    ratMats.spkeCount  = spkeCount; 
     
     pwd
     saveName = "Mats/ratMats_" + ratName + ".mat";
@@ -204,16 +221,6 @@ disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
 disp('fin')
 
 
-for i = 1:3
-    disp(' ')
-    txt = "outer " + num2str(i);
-    disp(txt)
-    
-    for i = 4:6
-       txt = "inner " + num2str(i);
-       disp(txt) 
-    end
-end
 
 
 
