@@ -1,4 +1,5 @@
 % Network analysis on the spiking connectivity
+% this is for the conditional probability analysis
 
 % Define inter-rat struct
 btRats.degs = zeros(4,3);
@@ -7,7 +8,7 @@ plt = 0;
 
 tic
 % for each rat, run analysis
-for rat = 1%1:4
+for rat = 1:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
     
     if rat == 1
