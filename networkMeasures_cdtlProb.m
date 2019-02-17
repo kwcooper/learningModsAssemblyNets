@@ -4,11 +4,11 @@
 % Define inter-rat struct
 btRats.degs = zeros(4,3);
 btRats.meanq = zeros(4,3);
-plt = 0;
+plt = 1;
 
 tic
 % for each rat, run analysis
-for rat = 1:4
+for rat = 2 %1:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
     
     if rat == 1
@@ -43,11 +43,11 @@ for rat = 1:4
         %keyboard; 
         
         % Grab matrix
-        CIJ = squeeze(ratMats.(fields{i}));
+        CIJ = squeeze(ratMats.probMat.(fields{i}).z);
         if plt
         h = figure; imagesc(CIJ); 
         title([ratName + " CIJ: " + fields{i}]); 
-        figName = "Figs/CIJ/" + ratName + "_" + fields{i} + "_CIJ";
+        figName = "Figs/cdtl_CIJ/" + ratName + "_" + fields{i} + "_CIJ";
         savefig(h, char(figName+".fig"));
         saveas(h,  char(figName+".png"));
         end
@@ -77,7 +77,8 @@ for rat = 1:4
         %% community detection
         numreps = 20;
         % find communities
-        ci = zeros(length(ratMats.clusters),numreps);
+        %ci = zeros(length(ratMats.clusters),numreps);
+        ci = zeros(size(CIJ,1), numreps);
         q = zeros(1,numreps);
         for irep = 1:numreps
             [ci(:,irep),q(irep)] = community_louvain(CIJ);
@@ -101,9 +102,9 @@ for rat = 1:4
             % visualize matrix
             h = figure; imagesc(ag(idx,idx)); hold on;
             plot(gx,gy,'w'); hold off;
-            title([ratName + " communities: " + fields{i}]);
+            title(["cdtl Prob: " + ratName + " communities: " + fields{i}]);
             
-            figName = "Figs/comm/" + ratName + "_" + fields{i} + "_comm";
+            figName = "Figs/cdtl_comm/" + ratName + "_" + fields{i} + "_comm";
             savefig(h, char(figName+".fig"));
             saveas(h,  char(figName+".png"));
         end
@@ -156,7 +157,7 @@ for rat = 1:4
     end
     
     % save it for later
-    saveName = "Mats/netStats_" + ratName + ".mat";
+    saveName = "cdtl_Mats/netStats_" + ratName + ".mat";
     save(saveName,"netStats");
 end
 disp('fin')
@@ -164,7 +165,7 @@ t=toc; % Takes around 44s
 disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
     
 % save it for later
-save("Mats/btRats.mat","btRats"); 
+save("cdtl_Mats/btRats.mat","btRats"); 
 
 
 
