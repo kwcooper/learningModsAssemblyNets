@@ -49,6 +49,7 @@ for rati = 1 %:4
     labels = {"PRE"; "MAZ"; "PST"};
     ratsBuffer = zeros(3, size(clust,2), size(clust,2));
     ratsNullBuffer = zeros(3, size(clust,2), size(clust,2));
+    ratsProbBuffer = {};
     count = 1;
     for phsi = [1,3,5]
         % Grab specific phase
@@ -178,37 +179,42 @@ for rati = 1 %:4
         ratsNullBuffer(count,:,:) = cRand;
         
         %% Run conditional probability analysis
+        % Bewhare, can take anywher up to 8 min per session
         disp('Computing spike conditional probability...')
         nrand = 100;
         window = 20;
         tic
         [Names,~,NewID] = unique(spikeIDsSeg); % fix the naming
-        [spkeCount,stats] = fcn_spikecondprob(NewID,spikeTimesSeg,window,nrand);
+        [spkeCount,probStats] = fcn_spikecondprob(NewID,spikeTimesSeg,window,nrand);
         toc
-        figure; imagesc(stats.pval(:,:,1))
+        if 1
+            figure; imagesc(probStats.pval(:,:,1));
+        end
         
-        
+        ratsProbBuffer{count} = probStats;
         
         count = count + 1;
         disp(' ')
-    end
+             end
     
     % unpack, store, and save
     ratMats = struct;
-    ratMats.pre        = squeeze(ratsBuffer(1,:,:));
-    ratMats.maz        = squeeze(ratsBuffer(2,:,:));
-    ratMats.pst        = squeeze(ratsBuffer(3,:,:));
-    ratMats.null.pre   = squeeze(ratsNullBuffer(1,:,:));
-    ratMats.null.maz   = squeeze(ratsNullBuffer(2,:,:));
-    ratMats.null.pst   = squeeze(ratsNullBuffer(3,:,:));
-    ratMats.numSpikes  = numSpikes;
-    ratMats.clusters   = clust;
-    ratMats.spikeTimes = spikeTimes;
-    ratMats.spikeIDs   = spikeIDs;
-    ratMats.phases     = phases;
-    ratMats.name       = ratName;
-    ratMats.Names      = stats
-    ratMats.
+    ratMats.pre          = squeeze(ratsBuffer(1,:,:));
+    ratMats.maz          = squeeze(ratsBuffer(2,:,:));
+    ratMats.pst          = squeeze(ratsBuffer(3,:,:));
+    ratMats.null.pre     = squeeze(ratsNullBuffer(1,:,:));
+    ratMats.null.maz     = squeeze(ratsNullBuffer(2,:,:));
+    ratMats.null.pst     = squeeze(ratsNullBuffer(3,:,:));
+    ratMats.numSpikes    = numSpikes;
+    ratMats.clusters     = clust;
+    ratMats.spikeTimes   = spikeTimes;
+    ratMats.spikeIDs     = spikeIDs;
+    ratMats.phases       = phases;
+    ratMats.name         = ratName;
+    ratMats.probMat.pre  = ratsProbBuffer{1};
+    ratMats.probMat.maz  = ratsProbBuffer{2};
+    ratMats.probMat.pst  = ratsProbBuffer{3};
+    %ratMats.spkeCount    = spkeCount; 
     
     pwd
     saveName = "Mats/ratMats_" + ratName + ".mat";
