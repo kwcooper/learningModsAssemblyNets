@@ -1,0 +1,7 @@
+
+
+What parameters to use?
+	for convolution the window is a large, 10000 ts sweep
+	for the conditional probability, the window size is 5
+
+ 

@@ -8,7 +8,7 @@ plt = 1;
 
 tic
 % for each rat, run analysis
-for rat = 2 %1:4
+for rat = 1:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
     
     if rat == 1
