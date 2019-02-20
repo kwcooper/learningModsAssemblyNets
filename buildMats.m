@@ -8,7 +8,7 @@ viewRast = 0;
 pwd
 % Choose dataset
 tic
-for rati = 2 %:4
+for rati = 1:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
     disp('Loading Data...');
     if rati == 1
@@ -220,7 +220,7 @@ for rati = 2 %:4
     saveName = "Mats/ratMats_" + ratName + ".mat";
     save(saveName,"ratMats");
 end
-t=toc; % Takes around 5m
+t=toc; % Takes around 5m (without conditional probability...) ~27m with
 disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
 
 disp('fin')

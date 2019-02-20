@@ -8,9 +8,8 @@ viewRast = 0;
 pwd
 % Choose dataset
 tic
-for rati = 1 %:4
+for rati = 2 %:4
     %load('NoveltySessInfoMatFiles/Achilles_10252013_sessInfo.mat')
-    tic
     disp('Loading Data...');
     if rati == 1
         load("NoveltySessInfoMatFiles/Achilles_11012013_sessInfo.mat")
@@ -182,8 +181,8 @@ for rati = 1 %:4
         % Bewhare, can take anywher up to 8 min per session
         disp('Computing spike conditional probability...')
         nrand = 100;
-        window = 20;
-        tic
+        window = 5;
+        
         [Names,~,NewID] = unique(spikeIDsSeg); % fix the naming
         [spkeCount,probStats] = fcn_spikecondprob(NewID,spikeTimesSeg,window,nrand);
         toc
@@ -214,12 +213,12 @@ for rati = 1 %:4
     ratMats.probMat.pre  = ratsProbBuffer{1};
     ratMats.probMat.maz  = ratsProbBuffer{2};
     ratMats.probMat.pst  = ratsProbBuffer{3};
+    ratMats.probMat.pst  = ratsProbBuffer{3};
     %ratMats.spkeCount    = spkeCount; 
     
     pwd
     saveName = "Mats/ratMats_" + ratName + ".mat";
     save(saveName,"ratMats");
-    toc
 end
 t=toc; % Takes around 5m
 disp(datestr(datenum(0,0,0,0,0,t),'HH:MM:SS'))
